@@ -1,0 +1,139 @@
+% Homework template for Inference and Information
+% UPDATE: September 26, 2017 by Xiangxiang
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+% amsmath: equation*, amssymb: mathbb, amsthm: proof
+\usepackage{moreenum}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % toprule
+\usepackage[mathcal]{eucal}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\input{iidef}
+\newtheorem{Def}{Definition}
+\begin{document}
+\courseheader
+
+\newcounter{hwcnt}
+\setcounter{hwcnt}{14} % set to the times of Homework
+
+\begin{center}
+  \underline{第\thehwcnt 周作业} \\
+\end{center}
+\begin{flushleft}
+  赵丰\quad \studentID\hfill
+  \today
+\end{flushleft}
+\hrule
+
+\vspace{2em}
+
+\flushleft
+\rule{\textwidth}{1pt}
+\begin{itemize}
+\item {\bf Acknowledgments: \/} 
+  This coursework refers to textbook.  
+\item {\bf Collaborators: \/}
+  \begin{itemize}
+  \item 9 was solved with the help from solution manual of the textbook.    
+  \item 18 was solved with the help from solution manual of the textbook.      
+  \end{itemize}
+\end{itemize}
+\rule{\textwidth}{1pt}
+
+\vspace{2em}
+
+I use \texttt{enumerate} to generate answers for each question:
+
+\begin{enumerate}[label=\arabic*.]
+  \setlength{\itemsep}{3\parskip}
+
+  \item 
+    我们给出一个随机算法：事件指定一运行轮数上限$K$，每轮将$G$每个顶点等概率地取三种颜色中的任一种,运行$K$轮，
+    取“满足”的边数最大的顶点颜色分配方案作为算法的返回值。
+    
+    设$G$有$n$条边，则$n\geq c^*$,对于我们的随机选颜色，记$Z$为满足的边数，随机变量$Z_i$定义为
+    \begin{equation}
+        Z_i = 
+        \begin{cases}
+            1 & \text{第$i$条边是“满足”的}\\
+            0 & \text{otherwise}
+        \end{cases}    
+    \end{equation}
+    容易得到$E[Z_i]=\frac{2}{3}$
+    则有$Z=\sum_{i=1}^n Z_i$，
+    根据期望的线性性质，得到$E[Z]=\frac{2}{3}n\geq \frac{2}{3}c^*$,因此我们的算法满足期望边数不小于$\frac{2}{3}c^*$。
+    
+  \setcounter{enumi}{2}    
+    \item \begin{enumerate}[label=(\alph*)]
+    \item 
+      考虑$S$中任意两个进程，若它们有冲突，则在$G$中它们是邻边，但根据进入$S$的规则，这两个进程获得的随机值
+      都取1，$S$中节点（某个进程）的相邻节点（冲突进程）随机值取零矛盾。因此集合$S$是无冲突的。
+      随机变量$S_i$定义为
+    \begin{equation}
+        S_i = 
+        \begin{cases}
+            1 & \text{第$i$个进程进入集合}\\
+            0 & \text{otherwise}
+        \end{cases}    
+    \end{equation}
+    容易得到$E[S_i]=\frac{1}{2^{d+1}}$
+    则有$S=\sum_{i=1}^n S_i$，
+    根据期望的线性性质，得到$E[S]=\frac{n}{2^{d+1}}$
+    
+    \item 
+    \begin{equation}
+        E[S]=np(1-p)^d
+    \end{equation}
+    $\frac{d E[S]}{d p}=0 \rightarrow p=\frac{1}{d+1}$
+    \begin{equation}
+        E[S]=\frac{nd^d}{(d+1)^{d+1}}
+    \end{equation}
+    
+    
+    \end{enumerate}
+
+  \setcounter{enumi}{8}    
+    \item   卖家采取的策略是首先记录前$\frac{n}{2}$个买家中报价的最高价$p$，然后
+    接受后$\frac{n}{2}$个买家中第一个大于$p$的出价。
+    在该策略下，卖家得到最高报价事件包含次高价在前一半买家，最高价在后一半买家。
+    根据排列组后的规律，后一个事件发生的概率为$\frac{n}{4(n-1)}>\frac{1}{4}$，因此卖家
+    可以用不小于$\frac{1}{4}$的概率接受$n$个报价中的最高价。
+  \setcounter{enumi}{17}    
+      \item \begin{enumerate}[label=(\alph*)]
+
+    \item 最小权顶点覆盖问题是指图$G$中所含顶点的权之和最小的顶点覆盖。对于这个问题，表中的随机算法不是$c-$近似的算法，
+    反例如下：考虑一个只有一条边的图，一个顶点权值为$2c$,另一个顶点权值为1。最优的最小权顶点覆盖权值之和为1，但按照表中的
+    随机算法，为$c+\frac{1}{2}$，不能被最优解的$c$倍控制住，因此举的例子说明了表中的随机算法不是$c-$近似的算法。
+    \item 最小规模顶点覆盖问题指图$G$中所含顶点数目最少的顶点覆盖。
+    对于这个问题，我们下面证明表中的随机算法是$2-$近似的算法。
+    设$p_e$表示算法中边$e$作为未覆盖的边被选中的概率，$S$是算法返回的顶点覆盖的集合,$\delta(v)$表示与顶点$v$关联的边。
+    算法给出的顶点覆盖的期望$|S|$即为选中的边的数目，即有
+        \begin{equation}
+           S=\sum_{e\in E} p_e
+        \end{equation}
+        记$|\delta(v)|=v_m$,对于任意$e_i\in \delta(v)$,如果$e_i$被选中了,那么对于其他的边$e_j \in \delta(v)$，最多只有$\frac{1}{2}$
+        的概率被选中（当顶点$v$没被加到$S$中时）。因此不等式$p_{e_i}\leq \frac{1}{2} p_{e_j}$成立。
+        所 以
+    \begin{equation}
+    \sum_{e\in \delta(v)} p_e\leq p_{e_j}\sum_{i\geq 0} \frac{1}{2^i}\leq 2
+    \end{equation}
+    设$S^*$为最优解对应的顶点覆盖的集合，
+        \begin{equation}
+           |S| \leq \sum_{v\in S^*} \sum_{e\in \delta(v)} p_e \leq \sum_{v\in S^*} 2 = 2|S^*|
+        \end{equation}
+    因此    表中的随机算法是$2-$近似的算法。
+        \end{enumerate}
+  \end{enumerate}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+    \begin{equation}
+    \end{equation}

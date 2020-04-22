@@ -1,0 +1,99 @@
+% Homework template for Inference and Information
+% UPDATE: September 26, 2017 by Xiangxiang
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+% amsmath: equation*, amssymb: mathbb, amsthm: proof
+\usepackage{moreenum}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % toprule
+\usepackage[mathcal]{eucal}
+\input{iidef}
+\begin{document}
+\courseheader
+
+\newcounter{hwcnt}
+\setcounter{hwcnt}{9} % set to the times of Homework
+
+\begin{center}
+  \underline{第\thehwcnt 周作业} \\
+\end{center}
+\begin{flushleft}
+  赵丰\quad \studentID\hfill
+  \today
+\end{flushleft}
+\hrule
+
+\vspace{2em}
+
+\flushleft
+\rule{\textwidth}{1pt}
+\begin{itemize}
+\item {\bf Acknowledgments: \/} 
+  This coursework refers to textbook.  
+\item {\bf Collaborators: \/}
+  \begin{itemize}
+  \item 23 was solved with the help from solution manual of the textbook.
+  \end{itemize}
+\end{itemize}
+\rule{\textwidth}{1pt}
+
+\vspace{2em}
+
+I use \texttt{enumerate} to generate answers for each question:
+
+\begin{enumerate}[label=\arabic*.]
+  \setlength{\itemsep}{3\parskip}
+  \setcounter{enumi}{5}
+  \item 
+    \begin{enumerate}[label=(\alph*)]
+    \item 首先该问题在\NP 类中，因为对给定的$x_1,x_N$的真值赋值作为判定证书，可以在多项式时间内判断赋值中1的
+    个数不超过$k$并且对各从句进行计算判断所有的从句是否均为1，满足这两条则实例属于该问题类。
+    
+    \item 对于给定的3-SAT 问题，我们用如下的方法将其归约为“少量真变量的单调可满足性问题”，
+    首先在每一个从句中将含有negation的
+    literal看作独立布尔变量，假如原3-SAT问题中变量中$x_i$取过反,
+    则相应的引入新的从句$x_i\cup \bar{x}_i$。
+    设3-SAT中总共取反的布尔变量数量为$t$，则我们在原来的己有从句基础上加了$t$个$x_i\cup \bar{x}_i$从句作为
+    “少量真变量的单调可满足性问题”的输入。
+    我们下面证明
+    “3-SAT” 满足 当且仅当
+    “少量真变量的单调可满足性问题”得到满足
+    至多有$t$个变量置1。
+    
+    首先设
+    3-SAT问题有一组布尔变量使所有从句为真，则对于“少量真变量的单调可满足性问题”，
+    通过扩展$t$个$\bar{x}_i$的取值为$x_i$的否，可以得到恰有$t$个变量置1的一组满足性问题。
+    
+    
+    反之，若存在至多有$t$个变量置1的一组满足性问题，
+    注意到由于加入了从句$x_i\cup \bar{x}_i$，所以$x_i$与$\bar{x}_i$不可能同时为0，
+    另一方面，由于$x_i,\bar{x}_i$中至少有1个取1，又总共取1的变量个数不超过$t$，所以
+    $x_i$与$\bar{x}_i$不可能同时为1，这样就满足了negation对变量关系的约束，
+    从而我们取诸$x_j$成为原3-SAT问题的判定为真的解。
+    \item 由于3-SAT问题是属于NP-complete 类中的，3-SAT问题可以归约到题中问题，所以题中问题也是NP-complete的。
+    \end{enumerate}
+  \setcounter{enumi}{22}    
+  \item 若$u$是$A$和$B$上的连接，
+  % 从$u$的头开始，可找到$a_i,b_j$分别为$u$的从头超始的某个子串，若$a_i=b_j$，则$a_i$即为要找的
+  % 长度被$A\cup B$总长多项式控制住的的$A\cup B$上的连接。否则不妨设$b_j$是$a_i$严格的从头超始的子串。
+  % 则可找到最小的$q$，与$b_{j1},\dots,b_{jq}$,使得$a_i$是$b_{j}b_{j1}\dots b_{jq}$从头超始的子串，并且
+  % $b_{j}b_{j1}\dots b_{jq}$是$u$从头超始的子串。
+  % 这里我们只讨论严格的情形，在$a_i=b_{j}b_{j1}\dots b_{jq}$时结论是平凡的。
+  % 注意到$b_{j}b_{j1}\dots b_{jq}$的长度被$a_i$与$b_{jq}$的长度之和控制住。  
+  记$u$某位置$p$上字符$\in$ 类$A(a_i,k)$，当$a_i$是在$u$的该位置的子串且$u(p)=a_i(k)$。
+  同理规定$p\in B(b_j,k)$的含义。$u$中每隔两类的总数目为$A$的长度和$L(A)+1$即会出现2个位置属于相同的$A$类。
+  如果$u$的长度超过$L(B)+1$个$L(A)+1$，对于这$L(B)+1$对位置，它们在$A$中的类相同，至少有1对它们在$B$中的类相同。
+  当把2个位置中间的元素去掉后，剩下的$u$仍是$A\cup B$上的连接。因此，我们从一个长度超过$L(B)+1$个$L(A)+1$的$u$出发，
+  总可以得到一个长度不超过$L(B)+1$个$L(A)+1$的串。这个量被$(L(A+B)+1)^2$控制住，因此可作为一个串是否是$A\cup B$上的连接的判定证书。
+\end{enumerate}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+ 

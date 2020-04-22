@@ -1,0 +1,118 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont[AutoFakeBold]{SimSun}
+\usepackage{amsmath,esint,amssymb,amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclareMathOperator{\sign}{sign}
+\begin{document}
+\title{第八周作业}
+\author{赵丰，2017310711}
+\maketitle
+\textbf{Ch6.6}
+针对所给的问题，我们有如下的观察，假如W至少用2行才能排下，对于规模为n的W，假设问题的最优解最后一行是
+$w_{n-k+1},\dots,w_n$，则把最后一行去掉可以得到子问题$W'=\{w_1,\dots,w_{n-k}\}$的最优解。
+因此我们设计如下的算法求出使得各行右边距平方和最小的单词分行,算法子程序返回的结果是三元组：[最小的平方和，行数，每行第一个单词]
+\begin{algorithm}
+\caption{Divide($w_1,w_2,\dots,w_n$)}
+\begin{algorithmic}[1]
+\IF{$\displaystyle\sum_{i=1}^n c_i +(n-1)\leq L$}
+\RETURN $[(L-\displaystyle\sum_{i=1}^n c_i +(n-1))^2,1,w_1]$
+\ENDIF
+\STATE $m=\infty,a=L+1$
+\FOR{$i=1$ to $n$}
+\STATE $a=a-c_i-1$
+\IF{$a<0$}
+\STATE \textbf{break}
+\ENDIF
+\STATE[$m_1,l_1,L_w$]=Divide($w_1,\dots,w_{n-i}$)
+\IF{$m_1+a^2<m$}
+\STATE   m=$m_1+a^2$
+\STATE $l=l_1+1$
+\STATE L=$L_w$.append($w_{n-i+1}$)
+\ENDIF
+\ENDFOR
+\RETURN [m,l,L]
+\end{algorithmic}
+\end{algorithm}
+
+粗略的估计上面给出的算法时间复杂度是$O(n^2)$
+
+\textbf{Ch6.8(a)}
+假设$f(\cdot)$是严格增函数,我们给出下面的例子：
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|c|c|c|c}
+\hline 
+i & 1 & 2 & 3 & 4 \\
+\hline
+$x_i$ & 1 & 10 & 10 & 7 \\
+f(i) & 1 & 6 & 7 & 8 \\
+\hline
+\end{tabular}
+\end{table}
+
+正确的答案是第2,4秒均激活EMP,摧毁的总量是12个机器人。
+但是按照(a)中给出的算法首先得到$j=3$，因此在第1,4秒激活EMP,摧毁的总量是8个机器人。
+
+\textbf{Ch6.8(b)}
+\begin{algorithm}
+\caption{Schedule-EMP($x_1,x_2,\dots,x_n$)}
+\begin{algorithmic}[1]
+\STATE 初始化$i=1,m=-\infty$
+\WHILE{$i\leq n$}
+\STATE   m=max\{m,Schedule-EMP($x_1,\dots,x_{n-i}$)+min\{$x_n$,f(i)\}\}
+\STATE   i $\leftarrow$ i+1
+\IF{$f(i)\geq x_n$}
+\STATE \textbf{break}
+\ENDIF
+\ENDWHILE
+\RETURN m
+\end{algorithmic}
+\end{algorithm}
+
+上面的算法通过在外层循环里判断$f(i)$和$x_n$对算法进行加速。因为在$f(i)\geq x_n$的条件下,$i$的增加只会引起
+Schedule-EMP($x_1,\dots,x_{n-i}$)+$x_n$的减小，因此不可能比原来的m还大。
+
+上面的算法只能得到摧毁机器人的总量，可以改写成非递归形式用增加存储的方式避免栈调用过多而发生溢出。
+
+在非递归的形式中，只要稍加修改便可以得到激活EMP的时间点（即保存使$m$取到最大的值的$i$）。
+
+考虑我们给出的算法的时间复杂度，由于Schedule-EMP($x_1,x_2,\dots,x_n$) n要从1算到$n$，即算法自身调用$n$次，每次调用最坏的情况是
+$i$遍历1到$n$，内循环是$O(1)$的，因此总的时间复杂度是$O(n^2)$。
+
+\textbf{Ch6.18}
+
+首先使用序列比对的算法可以计算出最小的代价$s$，若给出的比对$M$代价与$s$相等，则$M$是最小代价的比对。否则不是。
+
+我们可以适当修改序列比对的算法，在求最小值的一步中判断$\alpha_{x_iy_i}+$OPT$(i-1,j-1)$,$\delta+$OPT$(i-1,j)$,$\delta+$OPT$(i,j-1)$三个数的大小关系，如果有两个数同时取到最小值，
+那么最小代价的比对是不唯一的。若对$1\leq i\leq m,1\leq j\leq n$均不存在同时取到最小值的情况，那么最小代价的比对是唯一的。
+由于字符字母表只有4个字母，所以$\alpha_{x_iy_i}$的计算开销是$O(1)$的，额外的比较不会增加序列比对的算法的时间复杂度。因此
+我们给出了一个$O(mn)$的算法可以对给定的比对判断它是否为$A$与$B$之间唯一的最小代价的比对。
+
+\textbf{Ch6.20}
+设$n$门课程为$\{x_1,\dots,x_n\}$,
+用$K(n,H)$表示有$H$个小时完成课程$\{x_1,\dots,x_n\}$最高的平均成绩，则有如下递推关系式成立
+\begin{equation}
+nK(n,H)=\max_{0\leq i\leq H}\{(n-1)K(n-1,H-i)+f_n(i)\}
+\end{equation}
+上式中等式左边表示n门功课预期最高总成绩，右边表示在第$n$门课$x_n$用时为$i$小时的情况下预期成绩$f_n(i)$加上前$n-1$门功课的
+预期最高总成绩。如果对$i$取一个最大值，就得到其与等式左边相等。
+
+在实际计算中，我们只需考虑$f_n(i)$的跳点，这里我们总假设$f_t(0)=1$，即不交课题作业等级为最低的1。
+由于$f_n(i)$的值域是$1,2,\dots,g$，
+我们同时假设$i_k$是使得$f_n(i_k)=k$并且$f_n(i_k-1)=k-1$,并总取$i_1=0$,则
+\begin{equation}\label{eq:gnH}
+nK(n,H)=\max_{1\leq k\leq \min\{g,H\}}\{(n-1)K(n-1,H-i_k)+f_n(i_k)\}
+\end{equation}
+同时给出递推的初始条件，即$K(n,0)=1,n\geq 1$,即没有时间所有课题均得等级1，平均等级也为1。
+$K(0,H)=0$,即没有课题平均等级为0。
+
+根据\eqref{eq:gnH}式，不难看出我们给出的动态规划算法要计算$K(n,H)$需要递推计算$K(i,j),1\leq i\leq n,1\leq j\leq H$，计算每一个$K(i,j)$的时间
+复杂度至多为$g$。因此我们的算法是$O(gnH)$的。
+
+为了得到最优分配时间，只需在上述算法上稍加修改，计算每一个$K(i,j)$时存一个达到最小值时的课程$x_j$的用时即可。
+\end{document}

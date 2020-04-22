@@ -1,0 +1,133 @@
+% Homework template for Inference and Information
+% UPDATE: September 26, 2017 by Xiangxiang
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+% amsmath: equation*, amssymb: mathbb, amsthm: proof
+\usepackage{moreenum}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % toprule
+\usepackage[mathcal]{eucal}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\input{iidef}
+\newtheorem{Def}{Definition}
+\begin{document}
+\courseheader
+
+\newcounter{hwcnt}
+\setcounter{hwcnt}{12} % set to the times of Homework
+
+\begin{center}
+  \underline{第\thehwcnt 周作业} \\
+\end{center}
+\begin{flushleft}
+  赵丰\quad \studentID\hfill
+  \today
+\end{flushleft}
+\hrule
+
+\vspace{2em}
+
+\flushleft
+\rule{\textwidth}{1pt}
+\begin{itemize}
+\item {\bf Acknowledgments: \/} 
+  This coursework refers to textbook.  
+\item {\bf Collaborators: \/}
+  \begin{itemize}
+  \item 9 was solved with the help from solution manual of the textbook.    
+  \end{itemize}
+\end{itemize}
+\rule{\textwidth}{1pt}
+
+\vspace{2em}
+
+I use \texttt{enumerate} to generate answers for each question:
+
+\begin{enumerate}[label=\arabic*.]
+  \setlength{\itemsep}{3\parskip}
+  \setcounter{enumi}{7}
+  \item 回答是肯定的，对于负载均衡问题存在最优解$L^*$,我们按表一的方式对作业进行重排，得到重排链表$S$。
+    \begin{algorithm}
+    \caption{针对贪心负载均衡问题的作业排序算法}\label{alg}
+    \begin{algorithmic}[1]
+    \REQUIRE{最优解$L^*$对应的每台机器各自分配的作业集合为有序链表$A(i)$}    
+    \STATE 初始化重排后的作业顺序链表$S$为空表
+    \STATE 初始化$S$为空表
+    \STATE $T_i\leftarrow 0,1\leq i\leq m$
+    \WHILE{存在$A(i)$不为空}
+    \STATE $j=\argmin_{1\leq i\leq m} T_i$
+    \STATE 取出$A(j)$的第一个作业 $j$，
+    \STATE 将作业$j$加到$S$的链尾   
+    \STATE $T_j\leftarrow T_j+t_j$
+    \ENDWHILE
+    \RETURN $S$        
+    \end{algorithmic}
+    \end{algorithm}
+   下面我们说明将表一得到的重排链表作为贪心均衡算法的输入可以返回$A(i)$，从而得到最优解。   
+   为此采用归纳的方法，假设在某一步贪心均衡算法得到的$\tilde{A}(i)$是相应的$A(i)$的前几项，那么根据表一的方法，下一个作业$j$是
+   取当前各机器处理作业总时间最短的那台,又根据贪心均衡算法的性质,作业$j$会加到$\tilde{A}(j)$中，因此满足归纳假设的条件。
+   贪心均衡算法按表一得到的作业顺序处理最终可以返回最优的makespan。
+  \item 最大3-D 匹配问题可描述如下
+  \begin{Def}
+  设$X,Y,Z$是三个有限且互不相交的集合，$T\subset X\times Y\times Z$，称$M\subset T$是3-D matching,如果
+  对任意不相同的$(x_1,y_1,z_1)\in M,(x_2,y_2,z_2)\in M$,均有$x_1\neq x_2,y_1\neq y_2,z_1\neq z_2$。
+  最大3-D 匹配问题在给定$T$的情况下寻找最大的$|M|$。
+  \end{Def}
+  我们采用如下贪心算法得到$M$,以某种次序遍历$T$中的三元组，每次将$(x_1,y_1,z_1)\in T$加入$M$,如果$(x_1,y_1,z_1)$
+  不与$M$中之中任意元素发生冲突。
+  
+  下面我们说明贪心算法返回的$M$满足$|M^*|\leq 3|M|$,其中$M^*$是最优解。
+  
+  注意到$M$中$|M|$三元组共有$3|M|$个不同的元素组成集合$N$，$M^*$中任意一个三元组组成集合$\{x_1,y_1,z_1\}$必包含$N$中某个元素，
+  否则$\{x_1,y_1,z_1\}$可加入$M$中。且$\{x_1,y_1,z_1\}$最多包含$N$中一个元素，否则与$X,Y,Z$互不相交矛盾。
+  因此$|M^*|\leq |N|= 3|M|$
+  \setcounter{enumi}{9}
+  \item
+    \begin{enumerate}[label=(\alph*)]
+    \item 若$v\not\in S$，反设$v$的四个邻居节点均不在$S$中，则根据贪心算法的性质，算法不会终止，至少会把$v$加入$S$，因此
+    因此$v$的四个邻居节点至少有一个在$S$中，取权最大的那个设为$v'$，由于其权最大，根据贪心算法的性质，其是最早加入$S$的，在加入
+    $v'$之前，$v$和它的邻居节点均没有加入$S$,因为加入的是$v'$而不是$v$（$v$也是candidate之一）所以必有$w(v')\geq w(v)$。
+    \item 设$S$是贪心算法返回的独立集，$T$是$G$中任意一个独立集。
+    则
+    \begin{equation}
+            w(T)=\sum_{v\in T}w(v)
+    \end{equation}
+    若$v\in T \leftarrow v \in S$，记$v'=v$,有$w(v)=w(v')$否则由(a)知$\exists v'\in S, (v,v')$是$G$中一条边，
+    使得$w(v)\leq w(v')$,因此
+    \begin{equation}
+        \sum_{v\in T}w(v)\leq \sum_{v\in T}w(v')
+    \end{equation}
+    注意到当$v'=v$时，$v'$在不等式右端只能出现一次，否则$v$的一个邻居节点也在$T$中，与$T$是$G$的独立集矛盾。
+    当$v'$是$v$的一个邻居节点时，由于$v'$最多有4个邻居在$T$中，因此$v'$最多出现4次。
+    所以：
+    \begin{equation}
+        \sum_{v\in T}w(v')\leq 4\sum_{v' \in S}w(v')
+    \end{equation}
+    从而有$w(S)\geq \frac{1}{4}w(T)$。
+    \end{enumerate}
+    
+    \item 采用对重量进行舍入的方法，设$b=\epsilon w_{\max}/n$，对重量$w$进行舍入$\tilde{w}_i=\ceil{\frac{w_i}{b}}$
+    则舍入后的重量满足$b\tilde{w}_i\leq b+w_i$,从而有
+    \begin{align}
+        b\sum_{i=1}^n \tilde{w}_i\leq & mb+\sum_{i=1}^n w_i \\
+        \leq & w_{\max} \epsilon + \sum_{i=1}^n w_i\\
+        \leq & (1+\epsilon)\sum_{i=1}^n w_i\\
+        \leq & (1+\epsilon)W
+    \end{align}
+    因此如果用动态规划算法求解以$b\tilde{w}_i$作为重量的问题满足$\epsilon$松弛后的约束条件。
+    而求解$b\tilde{w}_i$与取$\tilde{W}=W/b$求解$\tilde{w}_i$一致，,用OPT(i,W)的算法可在$O(nW/b)$的时间内完成，注意到$W\leq n w_{\max}$，所以
+    $O(nW/b)=O(n^3/\epsilon)$，即该近似算法为多项式时间算法。
+  \end{enumerate}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+    \begin{equation}
+    \end{equation}

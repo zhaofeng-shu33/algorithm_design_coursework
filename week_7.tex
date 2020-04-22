@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont[AutoFakeBold]{SimSun}
+\usepackage{amsmath,esint,amssymb,amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{mathtools}
+\newtheorem{remark}{remark}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclareMathOperator{\sgn}{sgn}
+\begin{document}
+\title{第七周作业}
+\author{赵丰，2017310711}
+\maketitle
+
+\textbf{Ch5.3}
+
+\begin{remark}
+每次扔掉两张（不一样），扔一张（一样），保证过半的一类仍是过半。
+当只剩下一张或两张，再与扔掉中的所有卡片比较一遍，检查一遍。算法时间复杂度为$O(n)$
+\end{remark}
+
+我们将要说明对于规模为$O(n)$的问题，存在算法$\mathcal{A}$的
+时间复杂度为$T(n)$,满足$T(n)=2T(\frac{n}{2})+f(n)$，且$f(n)=O(n)$。
+则由Master Theorem, $\mathcal{A}$ 的时间复杂度为 $O(n\log n)$
+
+$\mathcal{A}$的非形式化描述为：
+
+Divide: 将$n$张银行卡等分为2份
+
+Conquer: 对每份（约有$\frac{n}{2}$）张银行卡运行判断算法，拿到2个布尔值，指示在每份中是否有一半以上的卡相互等价。
+
+Combine: 若2个布尔值均为 false, 则算法返回 false; 否则对每一个返回 true 的份，取其中
+一半以上的相互等价的卡中的一张（算法的返回值之一），与另一份的每一张逐份比较，若在另一份中匹配到超过一半以上的卡，则算法返回 true,
+若处理完每一个返回 true 的份，算法返回 false。
+
+初始：若该份只有1张卡，返回 true和该张卡; 若有2张卡，输入到等价性测试器中返回测试器的结果，且若两张卡等价，再返回其中一张卡。
+
+对算法$\mathcal{A}$，实际实现中，可以使用固定长度的数组存储$n$张银行卡，每次递归调用时只需给出子问题数组的头指针和尾指针。
+注意在 Combine 的过程中，2个布尔值均为 false 说明2个子问题中均没有超过一半的卡相互等价，可用反证法说明当前问题不可能有超过
+一半的卡相互等价。 当2个布尔值均为 true 时， Combine 过程可能达到最大的时间复杂度，即有可能比较 $2*O(\frac{n}{2})$次，因此
+$f(n)=O(n)$，即我们用分治的思想给出了一个时间复杂度为 $O(n\log n)$的有效算法。
+
+\textbf{Ch5.4}
+为计算$n$个$\frac{F_j}{q_j}$，定义函数:
+$f(i)=C q_i$,
+\begin{equation}
+g(i)=\begin{cases}
+\frac{\sgn(i)}{i^2} & i\neq 0\\
+0 & i=0 \\
+\end{cases}
+\end{equation}
+其中$\sgn(i)$为符号函数。
+则
+\begin{align}
+(f * g)(j)= &\sum_{i} Cq_i g(j-i)\\
+= &\sum_{i<j} \frac{C q_i}{(j-i)^2}-\sum_{i>j}\frac{C q_i}{(j-i)^2}
+\end{align}
+即$f$与$g$的卷积即为函数$F$,
+实际计算中$f$只能在$\{1,2,\dots,n\}$处取值，而$g$只能在$\{-n,-n+1,\dots,n-1,n\}$处取值。因此可通过
+序列$[f(1),\dots,f(n)]$与序列$[g(-n),\dots,g(n)]$作卷积，得到长为$3n$的序列。
+这长为$3n$的序列中间的$n$个值乘以相应的$q_j$后即为对应的
+$F_1,F_2,\dots,F_j$。
+
+于是可利用FFT以$O(n\log n)$的时间复杂度计算出各点的$F_j$。
+
+\textbf{Ch5.5}
+
+我们给出的算法的非形式化描述为：
+
+Divide: 将$n$条直线等分为2份
+
+Conquer: 对每份（约有$\frac{n}{2}$）运行算法，返回该份所有的交点从小到大排序的数组$L$，
+以及每个区间上最高的直线序号与其直线方程(可以实现为另一个数组$S$,长度比$L$多1)。
+
+Combine: 基本思路是对于两份交点表$L_1,L_2$和直线序号表$S_1,S_2$,由于$L_1,L_2$中的交点均排好了序，可以在$O(n)$的时间对两分交点表
+做归并，得到总的排序表，并且每在总的排序表$L$加入一个元素，即考虑其作为区间右端点的最小区间上最高的直线
+（考虑的区间$I$为$(a_{i-1},a_i)$，其中$a_i$为$L$的第$i$个元素）
+取好$I$后，最高的直线只需分别从$S_1,S_2$中对应位置比较后取出即可。
+%为此，我们分别针对每个$S_k$维护一个指针，指针初始化指向各$S_k$的
+%第一个元素，当$S_k$对应的$L_k$有交点被加入$L$中时，在做完当前比较后即把$S_k$的指针加1。
+
+初始：若该份只有1条直线，返回交点集为空，区间只有实轴，其上直线序号为唯一1条直线的序号；
+%若该份有2条直线$l_i,l_j$，若两直线不平行，
+%返回交点集只有两直线交点$a$，$(-\infty, a)$上较高的直线为$l_i$，$(a,\infty)$上较高的直线为$l_j$。
+%若平行，返回交点集为空，区间只有实轴，直线序号为截距较大的那条直线的序号。
+
+我们将上面Combine 的步骤以伪码的形式给出（见下页）。
+\begin{algorithm}
+\caption{Combine步骤}
+\begin{algorithmic}[1]
+\STATE 初始化$L,S$为空表
+\STATE 初始化$S_1$指针$p_1=1$,$S_2$指针为$p_2=1$，$L_1$指针$l_1=1$,$S_2$指针为$l_2=1$
+\WHILE{$l_1$<=$L_1$.length 或 $l_2$<= $L_2$.length}
+\IF{$L_2$为空$\,\,$ 或 $L_1(l_1)<L_2(l_2)$}
+\STATE 将$L_1(l_1)$加入$L$
+\STATE $l_1\leftarrow l_1+1$ 
+\ELSE
+\STATE 将$L_2(l_2)$加入$L$
+\STATE $l_2\leftarrow l_2+1$
+\ENDIF
+\IF{$L$只有一个元素}
+\STATE $I$=($-\infty$,$L_1$(1)]
+\ELSIF{$l_1$>$L_1$.length 且 $l_2$> $L_2$.length}
+\STATE $I$=[$L$.last,$+\infty$)
+\ELSE
+\STATE $I$=[$L$.last.previous,$L$.last]
+\ENDIF
+\IF{$S_1(p_1)$与$S_2(p_2)$在$I$上没有交点}
+    \IF{$S_1(p_1)>S_2(p_2)$}
+    \STATE 将 $S_1(p_1)$ 加入 $S$
+    \STATE $p_1 \leftarrow p_1+1$
+    \ELSE
+    \STATE 将 $S_2(p_2)$ 加入 $S$
+    \STATE $p_2 \leftarrow p_2+1$
+    \ENDIF
+\ELSE
+\STATE 求出$S_1(p_1)$与$S_2(p_2)$在$I$上的交点$a$
+\STATE 将$a$插入到$L$中倒数第二个位置
+\STATE 将 $S_1(p_1),S_2(p_2)$按斜率从小到大依次加入$S$
+\STATE $p_1,p_2$均加1
+\ENDIF
+\ENDWHILE
+\RETURN $L,S$
+\end{algorithmic}
+\end{algorithm}
+
+该算法Combine 步骤 While 循环只有n步，单步循环可用$O(1)$时间完成，所以总的时间复杂度为$O(n\log n)$，
+并且上述算法返回的$S$表即为所有可见的直线。
+
+\textbf{Ch5.6}
+我们从二叉树的根节点出发，初始时探查根节点的$x_v$值，当前节点为根节点，
+每次探查当前节点的两个子节点的$x_v$,若子节点的$x_v$均比当前节点大，则当前节点即为局部最小节点；
+否则取子节点中$x_v$较小的那个置为当前节点，若当前节点没有子节点，则当前节点即为局部最小节点。
+
+该算法至多探查$2d-1$个节点，其中$d=\log_2 (n+1)$为二叉树的深度，因此该算法的时间复杂度为$O(\log n)$。
+
+
+\end{document}

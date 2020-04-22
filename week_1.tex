@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont{SimSun}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\newtheorem{remark}{remark}
+\begin{document}
+\title{第一周作业}
+\author{赵丰，2017310711}
+\maketitle
+\textbf{P1}
+
+假，假设对所有的$i$,$m_i$ 优先列表第一位是 $w_i$,而女人$w_i$的优先列表第一位均不是$m_i$,这时即不存在。
+
+\textbf{P2}
+
+真，因为$(m,w)$如果不是一对，将成为不稳定因素，所以每一个稳定匹配的实例都包含对$(m,w)$.
+
+\textbf{P4}
+
+\begin{remark}
+加入$n-m$个失业岗位，在每个学生的Preference List中将失业岗位放到最后，变成Standard GS问题。
+\end{remark}
+
+设第$i$家医院有$m_i$个有效位置，并且满足
+\begin{equation}\label{eq:con}
+\sum_{i=1}^m m_i < n
+\end{equation}•
+\begin{algorithm}
+\caption{分配学生到医院的稳定匹配算法}
+\begin{algorithmic}[1]
+\STATE 初始化$S$为从医院到学生的匹配映射(multimap)
+\WHILE{某所医院$h$的有效位置没招满学生并且没有向所有学生都尝试提供offer}
+\FOR{对于$h$的第$i$个有效位置}
+\STATE $s$ $\leftarrow$ $h$的学生列表中第一个没有尝试提供offer的学生
+\IF{$s$ 没有配对}
+\STATE 增加 $h \,-\,s$ 对到$S$中 
+\ELSIF{在$s$的排名表上$h$的排名比$s$当前决定去的医院$h^{\prime}$的名次更靠前}
+\STATE 从 $S$ 中去掉$h^{\prime}\,-\,s$
+\STATE 增加$h\,-\,s$到$S$
+\STATE $h$的有效位置减1
+\STATE $h^{\prime}$的有效位置增1
+\ELSE
+\STATE $s$ 拒绝$h$ 提供的offer
+\ENDIF
+\ENDFOR
+\ENDWHILE
+\RETURN 稳定匹配$S$
+\end{algorithmic}
+\end{algorithm}
+由于\eqref{eq:con}，首先我们可以证明该算法结束后所有医院的有效位置都能招满。
+
+我们用反证法首先证明不存在第一类不稳定因素：假设存在学生$s,s^{\prime}$和医院$h$满
+足第一类不稳定因素的所有条件，则$s^{\prime}$没有收到任何一家医院的offer，所以对于$h$,$s^{\prime}$的优先级会在被$h$选择的$s$之后,这与第一类不稳定因素的第三个条件矛盾。
+
+下面用反证法证明不存在第二类不稳定因素：假设存在学生$s,s^{\prime}$和医院$h,h^{\prime}$满足第二类不稳定因素的所有条件。因为条件3，对于$h$,$s^{\prime}$的优先级比$s$高，$h$在选择$s$之前向$s^{\prime}$发过offer 但被$s^{\prime}$拒绝了。这说明在$s^{\prime}$的医院排名中，$h$要比它最后选择的$h^{\prime}$更靠后，而这与条件4矛盾。
+
+因此我们给出了一个稳定分配的算法。
+
+\textbf{P5(a)}
+
+我们可以给出一个算法保证可以找到不具有强不稳定因素的完美匹配。
+
+\begin{algorithm}
+\caption{不具有强不稳定因素的完美匹配}
+\begin{algorithmic}[1]
+\STATE 初始化$S$为空的匹配映射(map)
+\WHILE{某个男人$m$单身并且没有追求过所有女人}
+\STATE $w$ $\leftarrow$ $m$的列表中第一个没有尝试追求的女人，如果存在并列随机选一人
+\IF{$w$ 没有配对}
+\STATE 增加 $m \,-\,w$ 对到$S$中 
+\ELSIF{w对$m$的喜欢超过了对她当前伴侣$m^{\prime}$的喜欢，这里的超过是严格意义上的}
+\STATE 从 $S$ 中去掉$m^{\prime}\,-\,w$
+\STATE 增加$m\,-\,w$到$S$
+\ELSE
+\STATE $w$ 拒绝$m$
+\ENDIF
+\ENDWHILE
+\RETURN 稳定匹配$S$
+\end{algorithmic}
+\end{algorithm}
+首先我们可以证明该算法是完美匹配算法。
+下面用反证法证明不存在强不稳定因素：假设存在男人$m,m^{\prime}$和女人$w,w^{\prime}$,其中$m$和$w$都宁愿要对方而不要他们目前在$S$中的伴侣。对于$m$,$w$的优先级比$w^{\prime}$高，$m$在选择$w^{\prime}$之前追求过$w$， 但被$w$拒绝了。这说明在$w$的心目中，$m$要比它最后选择的$m^{\prime}$更靠后，而这与$w$更喜欢$m$矛盾。
+
+因此我们给出了一个稳定匹配的算法。
+
+\textbf{P5(b)}
+
+给出如下例子，有男人$m_1,m_2$和女人$w_1,w_2$,其中$w_1,w_2$更喜欢$m_1$但$m_1$对$w_1$和$w_2$同等喜欢。
+这样如果$m_1$和$w_1$是一对，则存在弱不稳定因素$m_1$和$w_2$;
+而如果$m_1$和$w_2$是一对，则存在弱不稳定因素$m_1$和$w_1$;
+因此对于所有的完美匹配都有一个弱不稳定因素。
+\end{document}

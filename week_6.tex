@@ -1,0 +1,142 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont[AutoFakeBold]{SimSun}
+\usepackage{amsmath,esint,amssymb,amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\begin{document}
+\title{第六周作业}
+\author{赵丰，2017310711}
+\maketitle
+
+\textbf{Ch5.1}
+\begin{algorithm}
+\caption{$O(\log n)$次查找中位数的算法}
+\begin{algorithmic}[1]
+\STATE 初始化两个数据库的查找范围为$r_1=[0,n),r_2=[0,n)$
+\STATE 初始化两个数据库的查找元素指针$p_1,p_2$均为$\floor{\frac{n}{2}}$，即查询每个数据库的中位数
+\WHILE{$r_1$和$r_2$均非空}
+\IF{$d(p_1)<d(p_2)$}
+\STATE $r_1 \leftarrow [\frac{r_1(f)+r_1(b)}{2},r_1(b))$
+\STATE $r_2 \leftarrow [r_2(a),\frac{r_2(f)+r_2(b)}{2})$
+\ELSE 
+\STATE $r_2 \leftarrow [\frac{r_2(f)+r_2(b)}{2},r_2(b))$
+\STATE $r_1 \leftarrow [r_1(a),\frac{r_1(f)+r_1(b)}{2})$
+\ENDIF
+\STATE $p_1 \leftarrow \floor{\frac{r_1(f)+r_1(b)}{2}}$
+\STATE $p_2 \leftarrow \floor{\frac{r_2(f)+r_2(b)}{2}}$
+\ENDWHILE
+\RETURN $d(p_1)$和$d(p_2)$较小的数作为$2n$个数据的中位数
+\end{algorithmic}
+\end{algorithm}
+
+上面算法中$[i,j)$表示从$i到j$的整数但不包括$j$,$d(p_1)$表示$p_1$指向的数据库1中的数据,
+若$r_2=[i,j)$,则$r_2(f)$表示$i$,$r_2(b)$表示$j$,$\floor{x}$表示对浮点数$x$向下取整。
+
+该算法利用二分查找的方法以$O(\log n)$的时间复杂度找到了$2n$个数据的中位数。
+
+\textbf{Ch5.2}
+类似计算逆序数的算法给出计算一个序列重要的逆序的算法如表\ref{alm:ch52}所示
+
+\begin{algorithm}
+\caption{sort\_and\_count(L)}\label{alm:ch52}
+\begin{algorithmic}[1]
+\IF{$L$长度为1}
+\RETURN 0
+\ENDIF
+\STATE $r_A \leftarrow $ sort\_and\_count(A)
+\STATE $r_B \leftarrow $ sort\_and\_count(B)
+\STATE 初始化数组$C$,长度与$L$相同,初始化指针$p_A=0,p_B=0,r_C=0$
+\FOR {$p$ 从 $1$ 到 $C$的最后一个元素}
+\IF{$p_B=$length(B) 或者 $A(p_A)\leq 2 B(p_B)$}
+\STATE $C(p)\leftarrow A(p_A)$
+\STATE $p_A \leftarrow p_A+1$
+\ELSE
+\STATE $r_C \leftarrow r_C+$length(A)$-p_A$
+\STATE $C(p)\leftarrow B(p_B)$
+\STATE $p_B \leftarrow p_B+1$
+\ENDIF
+\ENDFOR
+\STATE $L \leftarrow C$ 
+% L is revised!
+\RETURN $r_A+r_B+r_C$
+\end{algorithmic}
+\end{algorithm}
+
+
+\textbf{Master定理}
+
+设$T(n),f(n)$是一个以正整数为自变量的增函数，且满足递推关系
+\begin{equation}\label{eq:DefTn}
+T(n)=aT(\floor{\frac{n}{b}})+f(n)
+\end{equation}
+其中$a,b$是大于1的正整数,设$c=\log_b a$,那么可以分三种情形讨论$T(n)$的增长阶：
+\begin{enumerate}
+\item 若$f(n)=O(n^{c-\epsilon})$,其中$\epsilon>0$，那么$T(n)=\Theta(n^c)$
+\item 若$f(n)=\Theta(n^c \log^k n),\forall k\geq 0$,那么$T(n)=\Theta(n^c \log^{k+1} n)$
+\item 若$f(n)=\Omega(n^{c+\epsilon})$,其中$\epsilon>0$,并且存在常数$q<1$，使得对于充分大的$n$，有
+$af(\frac{n}{b})\leq qf(n)$，那么$T(n)=\Theta (f(n))$
+\end{enumerate}
+
+\begin{proof}
+
+对于情形1，我们令$n=b^x$，并设$m=x-\floor{x}$,
+于是$T(n)=T(b^x)$,并且我们取$T(b^m)$为一个已知的运行时间。
+令$G(x):=T(b^x)$,所以我们有
+\begin{equation}
+G(x)=aG(x-1)+f(b^x)
+\end{equation}
+递推得 
+\begin{equation}\label{eq:Rec}
+G(x)=a^{\floor{x}}  G(m)+ \sum_{i=0}^{\floor{x}-1}a^i f(b^{\floor{x}-i+m})
+\end{equation}
+根据已知条件,存在常数$C$，使得$f(n)\leq C n^{c-\epsilon}$,所以由等比数列求和公式，上式
+可放缩为:
+\begin{equation}\label{eq:Gxm}
+G(x)\leq a^{\floor{x}}  G(m)+ C \sum_{i=0}^{\floor{x}-1}a^i b^{(\floor{x}-i+m)(c-\epsilon)} 
+\end{equation}
+记$b_1=b^{c-\epsilon}$,上式化为
+\begin{equation}
+G(x)\leq a^{\floor{x}}  G(m)+C b_1^m \frac{a^{\floor{x}}-b_1^{\floor{x}}}{\frac{a}{b_1}-1}
+\end{equation}
+
+我们来比较一下$b_1$与$a$的大小从而确定$G(x)$被控制的量阶，
+因为
+\begin{equation}
+\log b_1 = (c-\epsilon)\log b =\log a - \epsilon \log b < \log a
+\end{equation}
+所以\eqref{eq:Gxm}式中$a^{\floor{x}}$为主要控制项
+进一步放缩得:
+\begin{equation}
+a^{\floor{x}} \leq a^x = a^{\frac{\log n}{\log b} }= n^c
+\end{equation}
+因此$T(n)=O(n^c)$，另一方面由\eqref{eq:Rec}式可得
+\begin{equation}
+G(x)\geq a^{\floor{x}}  G(m) \geq C_1 a^x
+\end{equation}
+因此$T(n)=\Omega(n^c)$，所以$T(n)=\Theta(n^c)$
+
+对于情形2,易知$a=b^c$,由\eqref{eq:Rec}式，可得
+\begin{align*}
+G(x) \sim & a^{\floor{x}}  G(m)+ \sum_{i=0}^{\floor{x}-1} a^i b^{c(\floor{x}-i+m)} ((\floor{x}-i+m)\log b)^k\\
+= &  a^{\floor{x}}  G(m) + a^{\floor{x}+m} (\log b)^k\sum_{i=1}^{\floor{x}}(i+m)^k  \\
+\sim & a^{\floor{x}}  G(m) + a^{\floor{x}+m} (\log b)^k\int_{1}^{\floor{x}}(y+m)^kdy \\
+\sim & C_1 a^{\floor{x}}(\floor{x}+m)^{k+1} \\
+\sim & n^c (\log n)^{k+1}
+\end{align*}
+
+对于情形3，由\eqref{eq:Rec}式以及$af(b^{x-1})\leq qf(b^x),\forall x>N$
+有
+\begin{align*}
+G(x) \leq & a^{\floor{x}}  G(m)+ \sum_{i=0}^{N} a^i f(b^{\floor{x}-i+m})+ \sum_{i=N}^{\floor{x}-1}q^i f(b^{\floor{x}+m}), |q|<1\\
+\leq  & a^{\floor{x}}  G(m)+ \frac{q^N}{1-q}f(b^{\floor{x}+m})+C_2\\
+\sim & f(n),\text{by }f(n)=\Omega(n^{c+\epsilon})
+\end{align*}
+所以$T(n)=G(x)=O(f(n))$
+另外由\eqref{eq:DefTn}式有$T(n)\geq f(n)$，所以$T(n)=\Omega(f(n))$
+从而有$T(n)=\Theta(f(n))$。
+\end{proof}
+\end{document}

@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont{SimSun}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\begin{document}
+\title{第二周作业}
+\maketitle
+\newcounter{mysection}
+\newcounter{mysubsection}[mysection]
+\addtocounter{mysection}{6} % set them to some other numbers 
+\addtocounter{mysubsection}{1} % set them to some other numbers 
+
+\arabic{mysection}.\alph{mysubsection}
+\stepcounter{mysubsection}
+由于这个算法有一个三重循环，每重循环的最大遍历次数为$n$，因此
+$f(n)=n^3$给出一个运行时间的上界。
+
+
+\arabic{mysection}.\alph{mysubsection}
+\stepcounter{mysubsection}
+
+\[
+\sum_{i=1}^{n-1}\sum_{j=i+1}^n(j-i+1)=\sum_{i=1}^{n-1}\frac{(3+n-i)(n-i)}{2}\geq \sum_{i=1}^{n-1}\frac{i^2}{2}=\Omega(n^3)
+\]
+
+\arabic{mysection}.\alph{mysubsection}
+\begin{algorithm}
+\caption{改进算法}
+\begin{algorithmic}
+\FOR{$i=1,2,\dots,n-1$}
+   \STATE $B[i,i]=A[i]$
+	\FOR{$j=i+1,i+2,\dots,n$}
+		\STATE $B[i,j]=B[i,j-1]+A[j]$
+	\ENDFOR	
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+上述算法的时间复杂度为$\Theta(n^2)$
+
+\addtocounter{mysection}{2}
+\arabic{mysection}.\alph{mysubsection}
+\stepcounter{mysubsection}
+
+将n近似分为$\sqrt{n}$个$\sqrt{n}$,从第一个横档开始，每次尝试上升
+$\sqrt{n}$个横档，如果某$i$次尝试中打碎了瓶子，则只需在
+$(i-1)\sqrt{n}$至$i\sqrt{n}$横档范围内按每次上升一个横档的方法搜索安全距离。最坏的情况是要搜索大约
+$f(n)=2\sqrt{n}$次。其时间复杂度的量阶小于$n$。
+
+\arabic{mysection}.\alph{mysubsection}
+
+对给定的$k$个瓶子，设计如下的算法进行搜索：
+
+将n近似分为$n^{1/k}$个$n^{1-1/k}$,从第一个横档开始，每次尝试上升
+$n^{1-1/k}$个横档，则最多上升$n^{1/k}$会打碎瓶子或上升到横档顶端。如果某$i$次尝试中打碎了瓶子，则只需在
+$(i-1)n^{1-1/k}$至$in^{1-1/k}$横档范围内搜索，这个范围共有
+$n^{1-1/k}$个瓶子，按照每次尝试上升$n^{1-2/k}$的方式进行搜索，则最多上升$n^{1/k}$会打碎瓶子或找到最高的安全横档。
+当第$j$次尝试打碎第二个瓶子时，搜索范围为$(j-1)n^{1-2/k}$至$jn^{1-2/k}$，
+如此继续下去。总共的搜索次数的最坏情况约为
+$f(k)=kn^{1/k}$,其时间复杂度的量阶为$n^{1/k}$,满足$k$越大,时间复杂度的量阶越小的要求。
+
+\textbf{Chp3.P5}
+对二叉树的深度$n$进行归纳。当$n=1$时，只有根节点，根节点也是叶节点，有两个孩子的节点数为$0$,满足条件。假设$n=k$时结论成立，
+增加一层节点后$n=k+1$层深度的二叉树的叶节点的增量为新增加的具有两个孩子的节点数目，因此二者相差1的关系对$n=k+1$层深度的二叉树也成立。
+
+\textbf{Chp3.P6}
+由BFS和DFS的性质，因为$G$连通，所以$G$与$T$的节点集
+相同，$G$的边集包含$T$的边集，现反设$G$中存在一条边不在$T$中，
+设这条边为$(u,v)$那么首先由BFS的性质$u,v$所在的层数最多相差1，
+又由DFS的性质，在T中$u$或$v$中一个是另一个的祖先，因此$u,v$在$T$中的距离恰好为1，这与边$(u,v)$不在$T$中矛盾，所以$G=T$。
+\end{document}

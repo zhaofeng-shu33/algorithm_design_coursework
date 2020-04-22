@@ -1,0 +1,198 @@
+% Homework template for Inference and Information
+% UPDATE: September 26, 2017 by Xiangxiang
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+% amsmath: equation*, amssymb: mathbb, amsthm: proof
+\usepackage{moreenum}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % toprule
+\usepackage[mathcal]{eucal}
+\input{iidef}
+\begin{document}
+\courseheader
+
+\newcounter{hwcnt}
+\setcounter{hwcnt}{11} % set to the times of Homework
+
+\begin{center}
+  \underline{第\thehwcnt 周作业} \\
+\end{center}
+\begin{flushleft}
+  赵丰\quad \studentID\hfill
+  \today
+\end{flushleft}
+\hrule
+
+\vspace{2em}
+
+\flushleft
+\rule{\textwidth}{1pt}
+\begin{itemize}
+\item {\bf Acknowledgments: \/} 
+  This coursework refers to textbook.  
+\item {\bf Collaborators: \/}
+  \begin{itemize}
+  \item 6 was solved with the help from solution manual of the textbook.  
+  \item 7 was solved with the help from solution manual of the textbook.    
+  \end{itemize}
+\end{itemize}
+\rule{\textwidth}{1pt}
+
+\vspace{2em}
+
+I use \texttt{enumerate} to generate answers for each question:
+
+\begin{enumerate}[label=\arabic*.]
+  \setlength{\itemsep}{3\parskip}
+  \setcounter{enumi}{4}
+  \item 
+     记平均负载为$a=\frac{1}{10}\sum_{k}t_k\geq 300$
+     在负载均衡问题的证明中，结合负载的特性有$t_j\leq 50$,$L_i-t_j\leq \frac{1}{10}\sum_{k}t_k=a$。
+     其中$L_i$是用时最长的机器(编号为$i$)的时长，$t_j$是最后放到第$i$台机器上的job。因此$L_i\leq a+50\leq a+ \frac{a}{6}\leq 1.2a$。
+     因此工期总是不超过平均负载的20\%。
+     
+  
+    \begin{algorithm}
+    \caption{针对两类机器的负载均衡问题的算法}\label{alg}
+    \begin{algorithmic}[1]
+    \FOR{$i=1$ to $m+k$}
+    \STATE $L_i \leftarrow 0$
+    \STATE $J(i)\leftarrow \emptyset$
+    \ENDFOR
+    \FOR{$j=1$ to $n$}
+    \STATE $i=\argmin_k L_k$
+    \STATE $J(i)\leftarrow J(i)\cup j$
+    \IF{$j$是快速机器}
+    \STATE $L_i\leftarrow L_i+\frac{t_j}{2}$
+    \ELSE
+    \STATE $L_i\leftarrow L_i+t_j$    
+    \ENDIF
+    \ENDFOR
+    \RETURN $J(1),\dots,J(m+k)$        
+    \end{algorithmic}
+    \end{algorithm}  
+    \item 
+    算法如表一所示,是多项式时间的。下面我们论证算法一返回的工期即$L\triangleq\max_i L_i \leq 3L^*$,其中$L^*$表示最优工期。
+    
+    首先有
+    \begin{equation}\label{eq:1}
+        L^*\geq \frac{t_i}{2},\forall i
+    \end{equation}    
+    考虑最优作业调度方案：对快速机器，假设集合$S_i$表示分配给第$i$台机器的作业，则$\sum_{j\in S_i} t_j \leq 2L^*$,
+    对$k$台机器对应的不等式求和得$\sum_{j\in S} t_j \leq 2kL^*$，其中$S$表示分配给快速机器的所有作业。
+    同理可得，对慢速机器，$\sum_{j\notin S} t_j \leq mL^*$，两式相加得
+    \begin{equation}\label{eq:2}
+        L^* \geq  \frac{\sum_i t_i}{m+2k}   
+    \end{equation}
+    假设算法一的作业调度方案的最长工时$L$是在快速机器上取到，其最后一件作业时长为$\frac{t_j}{2}$
+    则对于所有的快速机器$i$,$L-\frac{t_j}{2}\leq \sum_{k \in S_i} \frac{t_k}{2}$
+    对于所有的慢速机器$i$, $L-\frac{t_j}{2}\leq \sum_{k \not\in S_i} t_k$,
+    求和并结合(\ref{eq:1},\ref{eq:2})有$L\leq  \frac{t_j}{2}+ \frac{\sum_i t_i}{m+2k} \leq 2L^*$
+    
+    假设算法一的作业调度方案的最长工时$L$是在慢速机器上取到，其最后一件作业时长为$t_j$，同理得
+    $L\leq  t_j +\frac{\sum_i t_i}{m+2k} \leq 3L^*$
+
+    综上，算法一返回的工期不超过最优工期的3倍。
+
+    \begin{algorithm}
+    \caption{击中集问题的近似算法}\label{alg2}
+    \begin{algorithmic}[1]
+    \STATE 初始化n乘m的布尔矩阵A使得$A(i,j)$表示$a_i$是否在$B_j$中出现
+    \FOR{$i=1$ to $m$}
+    \STATE $p_i \leftarrow 0$
+    \ENDFOR
+    \WHILE{矩阵$A$中存在某一列$j$使得$w_i>\sum_{k=1}^m A(i,k)p_k,\forall i\in S=\{i|A(i,j)=1\}$}
+    \STATE $p_i\leftarrow p_i+\min_{k\in S}(w_k-\sum_{j=1}^m A(k,j)p_k)$
+    \ENDWHILE
+    \RETURN $H=\{a_i|w_i=\sum_{j=1}^m A(i,j)p_j\}$
+    \end{algorithmic}
+    \end{algorithm}  
+    
+    \setcounter{enumi}{3}
+    \item 
+    表二给出了击中集问题的近似算法，返回的集合为击中集$H$。首先注意到该算法对每个$p_j$只能修改一次，
+    且一旦修改后最终返回的$H$与$B_j$交为非空。
+    因此假如$B_j\cap H=\emptyset$,则$p_j$没有被修改过，仍保持初始值0。则while循环的条件得到满足，
+    这与算法提前返回$H$矛盾。
+    当$|B_i|=2,\forall i$时，即为带权的顶点覆盖问题，
+    此时$b=2$,即可以在多项式时间内找到总权不超过最优覆盖2倍的顶点覆盖。
+    因此表二中的近似算法是带权的顶点覆盖的近似算法的推广，其分析过程也与带权的顶点覆盖算法分析
+    类似。首先我们看到，在算法运行过程中始终有下面的关系成立。
+    \begin{equation}
+        w_i \geq \sum_{j=1}^m A(i,j)p_j,\forall 1\leq i\leq n    
+    \end{equation}
+     设$H$是任一击中集，将上面若干个式子相加有
+     \begin{align}\label{eq:pjwH}
+     \sum_{j=1}^m p_j \leq \sum_{a_i \in H}(\sum_{j=1}^m A(i,j)p_j)\leq \sum_{a_i\in H} w_i:=w(H)
+     \end{align}
+     假设$H^*$是使得元素总权最小的击中集。我们证明$w(H)\leq b\times w(H^*)$,
+     其中$H$是表二中的近似算法返回的击中集,b表示矩阵$A$各列和的最大值。
+     \begin{align}
+     w(H)=&\sum_{a_i\in H} w_i=\sum_{a_i\in H} \sum_{j=1}^m A(i,j)p_j\\
+     \leq &\sum_{i=1}^n \sum_{j=1}^m A(i,j)p_j\leq b\sum_{j=1}^m p_j\\
+     \leq & b\times w(H^*),\text{by \eqref{eq:pjwH}}
+     \end{align}
+     因此表二给出的算法可以找到一个总权不超过最小可能b倍的击中集。
+     
+    \begin{algorithm}
+    \caption{最大宽度的近似算法}\label{alg3}
+    \begin{algorithmic}[1]
+    \FOR{$i=1$ to $m$}
+    \STATE $L_i \leftarrow 0$
+    \STATE $A(i)\leftarrow \emptyset$
+    \ENDFOR
+    \FOR{$j=1$ to $n$}
+    \STATE $i=\argmin_k L_k$
+    \STATE $A(i)\leftarrow A(i)\cup j$
+    \STATE $L_i\leftarrow L_i+v_j$    
+    \ENDFOR
+    \RETURN $\min_{j} L(j)$        
+    \end{algorithmic}
+    \end{algorithm}  
+
+    \setcounter{enumi}{6}
+    \item 
+    \begin{enumerate}[label=(\alph*)]
+    \item
+    本问题的算法和负载均衡问题一致，即在无需按顾客的权值排序的情况下进行离线处理,表三给出了求解问题使用的近似算法，
+    其中$v_j$表示第$j$位顾客的权值。
+    设$L^*$为给定$v_j$后所能达到的最大宽度，根据问题的性质，最大宽度不超过顾客权值关于广告数量的平均，即
+    \begin{equation}\label{eq:LmSV}
+        L^* \leq \frac{1}{m} \sum_{j=1}^n v_j:=\frac{1}{m} S_v
+    \end{equation}
+    另一方面，根据本问中额外的假设$v_j\leq \frac{1}{2m}S_v,\forall j$,我们断言表三给出的算法返回的宽度$L$满足如
+    下的不等式：
+    \begin{equation}\label{eq:12mSv}
+        \frac{1}{2m} S_v \leq L
+    \end{equation}
+    反设$L<\frac{1}{2m} S_v$,设表三给出的算法最小值在$j$处达到（即$L_j=L$)，
+    在处理最后一位顾客$v_n$（没有考虑广告$A(j)$)之前,由贪心算法的性质，各广告的权值满足$\tilde{L_i}\leq L,\forall i$
+    即$L_i\leq L+v_n$,对$i$求和得
+    \begin{equation}
+        \sum_{i=1}^m L_i \leq mL+m\times v_n
+    \end{equation}
+    因为$\sum_{i=1}^m L_i=\sum_{i=1}^n v_i=S_v$,根据题目中额外的假设，上式右边严格小于$\frac{1}{2}S_v+\frac{1}{2}S_v$，
+    所以我们得到矛盾。因此根据\eqref{eq:LmSV}式和\eqref{eq:12mSv}式，我们直接推出:
+    \begin{equation}
+        \frac{L^*}{2}\leq L
+    \end{equation}
+    因此我们给出了一个近似宽度到因子2范围内的多项式时间算法。
+    
+    \item
+        考虑6位顾客，2个广告。6位顾客的权值为$\{1,3,2,1,2,3\}$,$S_v=12$,满足所有顾客权值不超过$S_V/(2\times 2)$。
+        最优解为6,但运行表三的算法，返回的最大宽度为5，因此表三算法没有找到最优解。
+    \end{enumerate}
+    
+     \end{enumerate}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+     \begin{equation}
+    \end{equation}

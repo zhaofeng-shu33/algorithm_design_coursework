@@ -1,0 +1,150 @@
+% Homework template for Inference and Information
+% UPDATE: September 26, 2017 by Xiangxiang
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, amsthm}
+% amsmath: equation*, amssymb: mathbb, amsthm: proof
+\usepackage{moreenum}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % toprule
+\usepackage[mathcal]{eucal}
+\input{iidef}
+\begin{document}
+\courseheader
+
+\newcounter{hwcnt}
+\setcounter{hwcnt}{10} % set to the times of Homework
+
+\begin{center}
+  \underline{第\thehwcnt 周作业} \\
+\end{center}
+\begin{flushleft}
+  赵丰\quad \studentID\hfill
+  \today
+\end{flushleft}
+\hrule
+
+\vspace{2em}
+
+\flushleft
+\rule{\textwidth}{1pt}
+\begin{itemize}
+\item {\bf Acknowledgments: \/} 
+  This coursework refers to textbook.  
+\item {\bf Collaborators: \/}
+  \begin{itemize}
+  \item 22 was solved with the help from solution manual of the textbook.
+  \item 27 was solved with the help from solution manual of the textbook.  
+  \end{itemize}
+\end{itemize}
+\rule{\textwidth}{1pt}
+
+\vspace{2em}
+
+I use \texttt{enumerate} to generate answers for each question:
+
+\begin{enumerate}[label=\arabic*.]
+  \setlength{\itemsep}{3\parskip}
+  \setcounter{enumi}{2}
+  \item 
+     首先“有效招聘问题”是属于\NP 的，因为至多$k$位申请人可以作为验证算法的有效证书，使得在多项式时间里可以判定
+     对给定的$m$位申请人原问题有解。
+     
+     其次我们将点覆盖(Vertex Cover)问题多项式归约到有效招聘问题。对给定的图$G(V,E)$，将$V$集合作为申请人的集合，$|G|=m$;
+     $E$集合作为运动的集合，$|E|=n$;
+     若$v_1,v_2$有边$e$相连，则存在申请人集合的子集$\{v_1,v_2\}$，使得集合中的两位申请人对$e$运动都有资格。
+     因此
+     图$G$中存在点集$S\subset V$,使得$|S|\leq k$,且$S$是$G$的点覆盖集，当且仅当
+     可以至多聘用$k$个管理人员并且对这$n$项运动中
+     的每一项至少有一位管理人员有资格。
+     从而点覆盖问题可以多项式归约到有效招聘问题。
+     因为点覆盖问题是\NP 完全的，从而有效招聘问题也是\NP 完全的。
+  \setcounter{enumi}{21}
+  
+    \begin{algorithm}
+    \caption{调用$\mathcal{A}$，在多项式时间内解决独立集问题}\label{alg}
+    \begin{algorithmic}[1]
+    \STATE 通过扩展的BFS算法，计算$G$的连通分支的个数$t(\leq |V|)$
+    \IF{$t==1$}
+    \RETURN 调用算法$\mathcal{A}(G,k)$
+    \ENDIF
+    
+    \STATE $m=0$
+    \FOR{$G$的每一连通分支$G_i=(V_i,E_i)$}
+    \FOR{$k_i=2$ to $|V_i|$}
+    \STATE $t_i \leftarrow $ 调用算法$\mathcal{A}(G_i,k_i)$
+    \IF{$t_i$ 为假}
+    \STATE \textbf{break}
+    \ENDIF
+    \ENDFOR
+    \STATE $m=m+k_i-1$
+    \ENDFOR
+    \IF{$m\geq k$}
+    \RETURN yes
+    \ELSE 
+    \RETURN no
+    \ENDIF
+    \end{algorithmic}
+    \end{algorithm}  
+     % 我们知道通过BFS算法可以在$G$的大小的多项式时间内判断$G$是否是连通的，如果$G$是连通的，那么直接
+     % 调用算法$\mathcal{A}$即可给出独立集的判断。如果$G$不是连通的，可以能过扩展BFS算法计算出$G$的连通分支的个数$(\leq |V|)$。
+     % 对每一连通分支$G_i=(V_i,E_i)$，从$k=1(\mathcal{A})$返回yes 开始,一直计算到$\
+     % Problem...  
+    \item (也可以考虑构造一个新的图，取一个新的顶点与$G$的所有顶点均相连，则对于$k\geq 2$的独立集一定不包含这个顶点，
+    但此时新的图$G'$是连通的，只需对$G'$运行一次$\mathcal{A}$算法即可对图$G$是否有大小不小于$k$的独立集做出判断)
+    表\ref{alg}给出的算法调用算法$\mathcal{A}$（多项式时间算法）的次数被$|V|^2$控制住，因此表\ref{alg}给出的算法也是多项式时间算法。
+    
+  \setcounter{enumi}{6}
+    \item 容易说明 存在$n$个彼此没有公共元素的4元组当且仅当有$n$个元组形成对$W\cup X \cup Y \cup Z $的一个集合覆盖。
+    首先可证明4维匹配是属于\NP 的，只需使用$n$个4元组作为验证证书，便可以在多项式时间内判定这$n$个4元组是否形成了对
+    $W\cup X \cup Y \cup Z $的覆盖。
+    其次我们把3维匹配多项式归约到4维匹配。给定集合$X,Y,Z$，大小均为$n$，以及三元组的集合$T\subset X \times Y \times Z$
+    任给大小为$n$的集合$W$满足与$X\cup Y\cup Z$不交，构造4元组的集合$T'=\{(w,x,y,z)|(x,y,z)\in T,w\in W\}$。
+    
+    若原3维匹配问题存在覆盖
+    $X\cup Y \cup Z \subset \cup_{i=1}^n\{x_i,y_i,z_i\}$,取$(w_i,x_i,y_i,z_i)\in T'$,则
+    $W \cup X\cup Y \cup Z \subset \cup_{i=1}^n\{w_i,x_i,y_i,z_i\}$，即构造出的4维匹配问题存在覆盖。
+
+    若构造出的4维匹配问题存在覆盖
+    $W \cup X\cup Y \cup Z \subset \cup_{i=1}^n\{w_i,x_i,y_i,z_i\}$,因为$W$与$X\cup Y\cup Z$不交，$|W|=n$,
+    则有$W=\cup_{i=1}^n\{w_i\}$。又因为$\{w_i,x_i,y_i,z_i\}\in T'$,所以$\{x_i,y_i,z_i\}\in T$,
+    因此取$(x_i,y_i,z_i)\in T$,
+    则$X\cup Y \cup Z \subset \cup_{i=1}^n\{x_i,y_i,z_i\}$。    
+    即原3维匹配问题存在覆盖。
+
+    从而3维匹配可以多项式归约到4维匹配，即4维匹配是\NP 完全的。
+    
+  \setcounter{enumi}{26}
+    \item 
+    首先可证明原问题是属于\NP 的，只需使用$k$个子集合$S_k$作为验证证书，便可以在多项式时间内判定所给不等式是否成立。
+    
+    其次我们把数的划分问题多项式归约到原问题。
+    给定正数$x_1,\dots,x_n$,记$s=\sum_{i=1}^n x_i$,
+    取$k=2,B=\frac{s^2}{2}$,若数的划分问题存在$S_1,S_2$不交，且
+    $\sum_{x_i\in S_1}x_i=\sum_{x_i\in S_2}x_i=\frac{s}{2}$,则$S_1,S_2$满足
+    \begin{equation}
+        (\sum_{x_i\in S_1}x_i)^2+(\sum_{x_i\in S_2}x_i)^2=\frac{s^2}{2}=B
+    \end{equation}
+    即$S_1,S_2$是原问题的解。
+    
+    反之，假设存在$S_1,S_2$，记$s_1=\sum_{x_i\in S_1}x_i,s_2=\sum_{x_i\in S_2}x_i$,使得
+    $s_1^2+s_2^2\leq \frac{s^2}{2}$，又$s_1+s_2=s$。由算术平均值小于平方平均值：
+    \begin{equation}\label{eq:a2}
+        \left(\frac{s_1+s_2}{2}\right)\leq \frac{s_1^2+s_2^2}{2}
+    \end{equation}
+    于是得$s_1^2+s_2^2\geq \frac{s^2}{2}$，故$s_1^2+s_2^2= \frac{s^2}{2}$，且式\eqref{eq:a2}等号成立当且仅当$s_1=s_2$,从而
+    $S_1,S_2$是数的划分问题的解。
+    
+    数的划分问题可以多项式归约到原问题，即原问题是\NP 完全的。
+    
+  \end{enumerate}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+ 

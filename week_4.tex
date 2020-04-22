@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont{SimSun}
+\usepackage{amsmath,esint,amssymb,amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\newtheorem{remark}{remark}
+\begin{document}
+\title{第四周作业}
+\author{赵丰，2017310711}
+\maketitle
+
+\textbf{Ch3.2}
+给定算法探测无向图是否有环。
+\begin{algorithm}
+\caption{探测无向图是否有环的算法}
+\begin{algorithmic}[1]
+\STATE 置 Discovered[s]=true 且对所有其他的v,置Discovered[v]=false
+\STATE 初始化 L[0] 由单个元素s构成
+\STATE 置层计数器 $i=0$
+\STATE 置当前的BFS 树 $T=\emptyset$
+\WHILE{L[i]不空}
+\STATE 初始化一个空表
+\FOR{每个结点 $u\in L[i]$}
+\STATE 考虑每条关联到$u$的边$(u,v)$
+\IF{Discovered[v]=false}
+\STATE 置 Discovered[v]=true
+\STATE 把边(u,v)加到树$T$上
+\STATE 把 v 加到表 L[i+1] 
+\ELSE 
+\STATE 初始化两个空表UL和VL
+\STATE 将$u$和$v$分别添加到UL和VL的表头中
+\WHILE{UL表头元素有祖先}
+\STATE 将UL和VL栈顶元素的祖先分别添加到UL和VL的表头中
+\ENDWHILE
+\IF{UL和VL表头元素不相等}
+\RETURN 内部错误
+\ELSE
+\STATE 去掉UL表头元素
+\RETURN UL的按照表头到表尾的顺序的元素，紧接着VL的按照表尾到表头的顺序的元素
+\ENDIF
+\ENDIF
+\ENDFOR
+\ENDWHILE
+\RETURN 给定图不包含环
+\end{algorithmic}
+\end{algorithm}
+算法说明：
+
+
+在书中BFS算法中 if discovered[v]=false
+后面加一个else 分支输出有环，达到这个分支说明$u$和$v$是同层节点，通过寻找到$u$和$v$在BFS树的共同祖先$w$,
+输出环 从$w$到$u$,
+从 $u$到$v$(一条边)，再从 $v$ 回到$w$。
+我们知道BFS算法的时间复杂度是$O(m+n)$,我们在BFS的算法基础上做出了适当的修改,
+由于一旦跳转到Else语句就会输出环而退出,Else中的语句只会执行一次，
+在BFS树中寻找同层节点的共同祖先的时间复杂度为树的最大深度，被节点个数$O(n)$所控制,输出环也只有$O(n)$的复杂度，因此加2个$O(n)$对
+修改后的BFS算法的时间复杂度没有本质影响，仍为$O(m+n)$。
+
+
+\textbf{Ch3.8}
+这个论断是假的，
+下面我们构造出连通图$G$使得
+%$\frac{\text{diam}(G)}{\text{apd}(G)}$
+可以任意大。
+$G$由一个完全图上一个顶点伸出一条链组成，链含有的顶点数为$m$,这其中不包含完全图的那个顶点，完全图的总顶点数为$n$,因此$G$共有
+$m+n$个顶点，容易计算出$\textrm{diam}(G)=m+1$,另一方面
+\begin{align*}
+\textrm{apd}(G) = & \frac{\binom{n}{2}+\frac{m(m^2-1)}{6}+\frac{m(m+1)}{2}+\frac{m(m+3)(n-1)}{2}}{\binom{m+n}{2}}\\
+ = & \frac{m^3+3 m^2 n+m (9 n-7)+3 (n-1) n}{3 (m+n-1) (m+n)}
+\end{align*}
+注意到对于固定的$m$,当$n\to \infty$时我们有$\textrm{apd}(G)\to 1$，因此$\frac{\textrm{diam}(G)}{\textrm{apd}(G)}>m$,由于对任意$m$成立，所以
+我们找到了这样的反例。
+
+\textbf{Ch4.4}
+
+\begin{remark}
+KMP 算法
+\end{remark}
+
+我们给出按$S$中最早出现$S'$某个事件的 greedy template 来在$S$中尝试找出子序列$S'$,算法的伪码描述如下：
+\begin{algorithm}
+\caption{判断$S'$是否是$S$的子序列}
+\begin{algorithmic}[1]
+\STATE 初始化$S$的位置指针$i$指向$S$的第一个事件
+\FOR{$S'$从左到右的每个事件$S'_j$}
+    \WHILE{$S$的第$i$个事件$S_i$与$S'_j$不一样}
+       \STATE $S$的位置指针$i$增加1
+       \IF{$i$超出了$S$的最后一个位置}
+          \RETURN $S'$不是$S$的子序列
+       \ENDIF
+    \ENDWHILE
+    \STATE $S$的位置指针$i$增加1    
+\ENDFOR
+\RETURN $S'$是$S$的子序列
+\end{algorithmic}
+\end{algorithm}
+
+该算法的运行时间为While循环内部执行次数(n次)和While循环条件判断失败后外部For循环执行次数(m次),
+因此时间复杂度是$O(m+n)$，其实如果$m>n$,可以直接返回$S'$不是$S$的子序列，而在$m\leq n$的情况下，
+可以化简时间复杂度为$O(n)$。
+ 
+下面我们证明该算法的正确性。
+该算法会犯两类错误，弄假成真或者弄真成假。根据算法的特点，不可能弄假成真。
+下面考虑是否弄真成假的情况：设$S$中存在$S_{i(k)}=S'_k$,其中
+$i(k)$是一个从自然数到自然数的映射，且有单调增加的性质。则对$S,S'$运行我们的算法，第一次找到$S_{t(1)}=S'_1$必有
+$t(1)\leq i(1)$,依此类推，$S_{t(m)}=S'_m$必有$t(m)\leq m$，因此该算法返回$S'$是$S$的子序列，不会弄真成假。
+
+\textbf{Ch4.6}
+记每个竞争者跑步时间和骑车时间之和为非游泳时间，由于跑步和骑车可同时进行，
+所以只考虑非游泳时间不影响最小完成时间。希望设计一个算法，输入是每个人的游泳时间和非游泳时间，输出是每个人开始比赛的时间
+（必须先游泳）。
+我们的贪心策略是优先非游泳时间长的。首先按照大家非游泳时间从大到小安排，然后先安排非游泳时间最长的竞争者，
+后一个人开始时间放到前一个人预期游泳结束之时。下面证明该算法可以给出一个最小完成时间的安排。
+对于最优安排的集合，
+假设上面算法返回的安排与最优的安排前$k$个人都是相同的，使$k$取到了最大值的最优安排记为$\mathcal{A}$。
+对于第$k+1$个人，上面算法选择的竞争者$i$比最优安排$\mathcal{A}$选的竞争者$j$具有更长的非游泳时间，
+我们现在构造一个安排，它是在$\mathcal{A}$的基础上交换$i$和$j$的安排顺序得到的$\mathcal{A'}$，由于$i$提前进入比赛，完成比赛时间
+也相应提前了。当$j$被置后时，相比于原来位置的$i$,他们出泳池的时间是相同的，都是
+之前所有运动员游泳时间之和，但注意到$i$的非游泳时间比$j$要长，所以交换后相比于原来位置的$i$,$j$可以提前完成比赛。
+因此可以看出把$i$提前并不会增加总时间。这样我们得到的$\mathcal{A'}$也是一个最优安排，
+且它与我们上面算法返回的安排具有至少前$k+1$个人相同，这与使$k$取到了最大值矛盾，因此只能有$k$与竞争者人数相同，即我们的算法
+也给出了一个最优安排。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
