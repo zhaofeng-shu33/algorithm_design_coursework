@@ -1,0 +1,23 @@
+﻿\documentclass{article}
+\usepackage{xeCJK}
+\usepackage{amsmath,esint,amssymb,amsthm}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{mathtools}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\begin{document}
+\title{去年期末考试第三题}
+\author{赵丰，2017310711}
+\maketitle
+首先将最优问题转化为判定性问题，即判断$U$是否存在一个不超过$K$的最小子集$H$满足条件。
+对于1，首先说明有大小不超过m的判定证书，
+这只需在每个$S_i$取一个元素构成一个有$m$个元素的集合$H$满足与$S_i$交非空。
+所以最小子集$H$的大小$\leq m$. 
+其次我们把 Vertex-Cover 问题多项式归约到 Hitting set problem;
+我们把图G的顶点编号为1到n,对于图$G$的每一条边$e_i=(j,k)$,相应的的构造集合$S_i=\{i,k\}$。可以证明
+$G$有不超过$K$的顶点覆盖当且仅当存在一个不超过$K$的最小子集$H$与$m$（图$G$边的个数）个$S_i$的交均非空。
+\end{document}
+
+
